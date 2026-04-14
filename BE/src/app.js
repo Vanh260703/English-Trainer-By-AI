@@ -20,12 +20,12 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
 
 const corsOptions = {
   origin: (origin, cb) => {
-    // Cho phép không có origin (mobile app, Postman, server-to-server)
+    console.log('[CORS] origin:', origin);
     if (!origin) return cb(null, true);
     const cleanOrigin = origin.replace(/\/$/, '');
     if (allowedOrigins.includes(cleanOrigin)) return cb(null, true);
-    // Cho phép tất cả Vercel preview deployments
     if (/\.vercel\.app$/.test(cleanOrigin)) return cb(null, true);
+    console.log('[CORS] blocked:', cleanOrigin);
     cb(new Error(`CORS: ${origin} not allowed`));
   },
   credentials: true,
