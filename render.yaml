@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: english-trainer-be
+    runtime: node
+    rootDir: BE
+    buildCommand: npm install
+    startCommand: node src/app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000

@@ -7,7 +7,8 @@ const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 ngày
 const refreshCookieOptions = {
   httpOnly: true,
   secure: IS_PROD,
-  sameSite: IS_PROD ? 'strict' : 'lax',
+  // 'none' bắt buộc khi FE và BE khác domain (Vercel + Render)
+  sameSite: IS_PROD ? 'none' : 'lax',
   path: '/api/auth/refresh-token', // chỉ gửi đến đúng endpoint này
   maxAge: REFRESH_COOKIE_MAX_AGE,
 };

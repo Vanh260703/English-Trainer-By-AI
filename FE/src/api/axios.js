@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// Dev: '/api' → proxied qua Vite đến BE container
+// Prod: VITE_API_URL = https://<render-app>.onrender.com/api
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  withCredentials: true, // gửi kèm cookie khi cross-domain
+});
 
 // Attach access token from localStorage-backed memory
 api.interceptors.request.use((config) => {
@@ -37,7 +42,7 @@ api.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
       try {
-        const { data } = await axios.post('/api/auth/refresh-token');
+        const { data } = await api.post('/auth/refresh-token');
         window.__accessToken = data.accessToken;
         processQueue(null, data.accessToken);
         original.headers.Authorization = `Bearer ${data.accessToken}`;
