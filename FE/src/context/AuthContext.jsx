@@ -10,15 +10,26 @@ export function AuthProvider({ children }) {
   const setToken = (token) => { window.__accessToken = token; };
 
   // Try to restore session on mount via refresh token cookie
+  // Retry once after delay to handle Render cold start (free tier sleeps)
   useEffect(() => {
-    api.post('/auth/refresh-token')
-      .then(({ data }) => {
-        setToken(data.accessToken);
-        return api.get('/auth/me');
-      })
-      .then(({ data }) => setUser(data.user))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const restore = (retryOnFail = true) => {
+      api.post('/auth/refresh-token')
+        .then(({ data }) => {
+          setToken(data.accessToken);
+          return api.get('/auth/me');
+        })
+        .then(({ data }) => setUser(data.user))
+        .catch(() => {
+          if (retryOnFail) {
+            setTimeout(() => restore(false), 5000);
+          }
+        })
+        .finally(() => { if (!retryOnFail) setLoading(false); });
+    };
+    restore();
+    // Ensure loading is cleared even if retry never fires
+    const timeout = setTimeout(() => setLoading(false), 12000);
+    return () => clearTimeout(timeout);
   }, []);
 
   // Listen for forced logout from interceptor
