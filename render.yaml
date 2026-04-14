@@ -10,3 +10,5 @@ services:
         value: production
       - key: PORT
         value: 8000
+      - key: CLIENT_URL
+        value: https://english-trainer-by-ai.vercel.app
