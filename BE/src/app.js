@@ -24,6 +24,8 @@ const corsOptions = {
     if (!origin) return cb(null, true);
     const cleanOrigin = origin.replace(/\/$/, '');
     if (allowedOrigins.includes(cleanOrigin)) return cb(null, true);
+    // Cho phép tất cả Vercel preview deployments
+    if (/\.vercel\.app$/.test(cleanOrigin)) return cb(null, true);
     cb(new Error(`CORS: ${origin} not allowed`));
   },
   credentials: true,
