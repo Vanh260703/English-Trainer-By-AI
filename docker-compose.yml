@@ -1,0 +1,61 @@
+services:
+  # ─── MongoDB ───────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: ai_trainer_mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app_network
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Backend ───────────────────────────────────────────────
+  be:
+    build:
+      context: ./BE
+      target: development
+    container_name: ai_trainer_be
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./BE/.env
+    volumes:
+      - ./BE:/app
+      - /app/node_modules
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  # ─── Frontend ──────────────────────────────────────────────
+  fe:
+    build:
+      context: ./FE
+      target: development
+    container_name: ai_trainer_fe
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./FE:/app
+      - /app/node_modules
+    depends_on:
+      - be
+    networks:
+      - app_network
+
+volumes:
+  mongo_data:
+
+networks:
+  app_network:
+    driver: bridge
