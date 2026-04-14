@@ -19,15 +19,7 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
   .map(o => o.trim().replace(/\/$/, '')); // xoá trailing slash nếu có
 
 const corsOptions = {
-  origin: (origin, cb) => {
-    console.log('[CORS] origin:', origin);
-    if (!origin) return cb(null, true);
-    const cleanOrigin = origin.replace(/\/$/, '');
-    if (allowedOrigins.includes(cleanOrigin)) return cb(null, true);
-    if (/\.vercel\.app$/.test(cleanOrigin)) return cb(null, true);
-    console.log('[CORS] blocked:', cleanOrigin);
-    cb(new Error(`CORS: ${origin} not allowed`));
-  },
+  origin: true, // reflect origin — allow all temporarily to debug
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
