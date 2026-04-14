@@ -14,14 +14,25 @@ const PORT = process.env.PORT || 8000;
 connectDB();
 
 // Middleware
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map(o => o.trim());
-app.use(cors({
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
+  .split(',')
+  .map(o => o.trim().replace(/\/$/, '')); // xoá trailing slash nếu có
+
+const corsOptions = {
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    // Cho phép không có origin (mobile app, Postman, server-to-server)
+    if (!origin) return cb(null, true);
+    const cleanOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(cleanOrigin)) return cb(null, true);
     cb(new Error(`CORS: ${origin} not allowed`));
   },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // handle preflight cho tất cả routes
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
