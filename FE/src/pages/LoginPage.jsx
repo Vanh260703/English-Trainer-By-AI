@@ -48,12 +48,14 @@ export default function LoginPage() {
     }
   };
 
+  const BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
+
   const handleGoogle = () => {
-    window.location.href = 'http://localhost:8000/api/auth/google';
+    window.location.href = `${BASE}/api/auth/google`;
   };
 
   const handleFacebook = () => {
-    window.location.href = 'http://localhost:8000/api/auth/facebook';
+    window.location.href = `${BASE}/api/auth/facebook`;
   };
 
   return (
