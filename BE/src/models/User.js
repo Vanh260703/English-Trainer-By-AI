@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
       unique: true,
+      sparse: true, // OAuth users có thể không có email
       lowercase: true,
       trim: true,
     },
