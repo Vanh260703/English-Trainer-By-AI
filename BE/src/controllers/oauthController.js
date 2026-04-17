@@ -20,7 +20,7 @@ exports.handleOAuthCallback = async (req, res) => {
     setRefreshTokenCookie(res, refreshToken);
 
     // Fragment (#) không được gửi lên server → an toàn hơn query param
-    res.redirect(`${CLIENT_URL}#token=${accessToken}`);
+    res.redirect(`${CLIENT_URL}/dashboard#token=${accessToken}`);
   } catch {
     res.redirect(`${CLIENT_URL}/login?error=oauth_failed`);
   }
